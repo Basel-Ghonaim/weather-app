@@ -1,75 +1,55 @@
-# React + TypeScript + Vite
+# حالة الطقس — Weather App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small Arabic, right-to-left weather app. Search for a city (in Arabic or English) and see its current
+conditions from OpenWeather: temperature (°C), description, feels-like, humidity (%) and wind speed (m/s).
 
-Currently, two official plugins are available:
+Built with React, Vite, TypeScript, Tailwind CSS v4 and Axios.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+cp .env.example .env   # then set VITE_OPENWEATHER_API_KEY
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Get a free API key at <https://home.openweathermap.org/api_keys>. New keys can take a short while to activate;
+until then the app shows an "invalid key" message.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+> **Security note:** `VITE_` variables are bundled into the client and are **not secret**. This is acceptable for a
+> local MVP only. Proxy requests through a backend before any public deployment. Never commit `.env`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scripts
 
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Type-check (`tsc -b`) and build for production |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview the production build |
+
+## Structure
+
+```text
+src/
+  api/openWeatherClient.ts      Axios instance and raw OpenWeather requests
+  services/weatherService.ts    Geocode → current weather → domain model, typed errors
+  types/weather.ts              Weather model, WeatherService contract, error codes
+  hooks/useWeatherSearch.ts     Search state (idle/loading/success/error), stale-response guard
+  i18n/ar.ts                    All Arabic UI text and error messages
+  components/                   SearchBar, WeatherCard, WeatherDetails, StatusMessage
 ```
+
+UI components depend only on the `WeatherService` contract, so the provider can be swapped without touching them.
+
+## Docs
+
+- [docs/MVP.md](docs/MVP.md) — scope and requirements
+- [docs/TASKS.md](docs/TASKS.md) — implementation task map
+
+## Deferred work
+
+- Picker for ambiguous city names (the first geocoding match is used today)
+- Forecasts, saved cities, language switcher
+- Automated test suite (verified so far with a scripted headless-browser test matrix)
+- Backend proxy to protect the API key
