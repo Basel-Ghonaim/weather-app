@@ -5,5 +5,5 @@
 }
 
 body {
-  @apply min-h-screen bg-sky-950 font-sans text-white antialiased;
+  @apply min-h-screen bg-sky-950 bg-linear-to-br from-sky-500 via-indigo-600 to-sky-950 bg-fixed font-sans text-white antialiased;
 }
